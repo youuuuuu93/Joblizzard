@@ -30,6 +30,8 @@
     { id: 'PST_SIMPLE',     libelle: 'Pansement (autre que lourd et complexe) – depuis 21/06/2026', lettre: 'AMI', coef: 2.02, du: '2026-06-21', verifie: false,
       note: 'Décision UNCAM du 2/06/2026 : AMI 2 → AMI 2,02. Contrôler le libellé exact de l\'acte sur la NGAP.' },
     { id: 'PST_LOURD', libelle: 'Pansement lourd et complexe (+ MCI possible)', lettre: 'AMI', coef: 4, verifie: true },
+    { id: 'STOMIE', libelle: 'Pansement de stomie / changement de poche (colo-, iléo-, urostomie)', lettre: 'AMI', coef: 3, verifie: false,
+      note: 'Sources divergentes : AMI 3 (le plus cité) ou AMI 2 (chapitre « pansements courants »). Vérifier le texte NGAP en vigueur ; si besoin, utiliser « Acte libre ».' },
     { id: 'ANALG_TOP', libelle: 'Analgésie topique préalable à un pansement', lettre: 'AMI', coef: 1.1, verifie: true },
     { id: 'ABL_FILS_10', libelle: 'Ablation de fils ou agrafes (≤ 10)', lettre: 'AMI', coef: 2, verifie: false },
     { id: 'ABL_FILS_P10', libelle: 'Ablation de fils ou agrafes (> 10)', lettre: 'AMI', coef: 4, verifie: false },

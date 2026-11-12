@@ -130,3 +130,10 @@ test('Erreurs bloquantes : tarif DROM inconnu, heure manquante, sans acte', () =
   const s = jour([V({ date: '2027-11-02', actes: [{ id: 'INJ_SC' }] })], [P()], { zone: 'DOM', surcharges: { 'AMI|DOM|2027-11-01': 3.62 } }).resultats[0];
   assert.equal(ligne(s, 'AMI').montant, 3.62);
 });
+
+test('Stomie : AMI 3 avec alerte de contrôle', () => {
+  const r = jour([V({ actes: [{ id: 'STOMIE' }] })], [P()]).resultats[0];
+  assert.deepEqual(r.erreurs, []);
+  assert.equal(ligne(r, 'AMI').montant, 10.05); // 3 × 3,35
+  assert.ok(r.alertes.some((a) => a.includes('stomie')));
+});
