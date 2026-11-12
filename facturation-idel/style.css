@@ -33,3 +33,16 @@ td.num, th.num { text-align: right; white-space: nowrap; }
 .cotation { font-family: ui-monospace, Consolas, monospace; background: #f0f3f6; padding: .2rem .4rem; border-radius: 4px; }
 .total { font-size: 1.1rem; font-weight: 700; text-align: right; }
 @media print { header nav, .bandeau, form, button, .ligne label { display: none !important; } .onglet { display: none !important; } #tournee { display: block !important; } .carte { border: none; } }
+/* --- Mobile / iPhone --- */
+fieldset { min-width: 0; }
+select, input:not([type=checkbox]) { max-width: 100%; min-width: 0; }
+#vActe { flex: 1 1 100%; width: 100%; }
+.carte { overflow-x: auto; }
+@media (max-width: 700px) {
+  input, select { font-size: 16px; } /* évite le zoom automatique de Safari */
+  main { padding: .5rem; }
+  header { padding: .5rem; gap: .4rem; }
+  nav button { padding: .35rem .55rem; }
+  .grille { grid-template-columns: 1fr; }
+  button, .bouton { padding: .6rem .9rem; }
+}
