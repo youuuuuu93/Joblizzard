@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Facturation IDEL</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Facturation IDEL</h1>
+  <nav>
+    <button data-onglet="tournee" class="actif">Tournée</button>
+    <button data-onglet="patients">Patients</button>
+    <button data-onglet="factures">Factures</button>
+    <button data-onglet="tarifs">Tarifs</button>
+    <button data-onglet="parametres">Paramètres</button>
+  </nav>
+</header>
+<div id="bandeau" class="bandeau">Outil d'aide au calcul : contrôlez chaque cotation avant télétransmission avec votre logiciel agréé SESAM-Vitale.</div>
+
+<main>
+<!-- ================= TOURNÉE ================= -->
+<section id="tournee" class="onglet actif">
+  <div class="ligne">
+    <label>Date de la tournée <input type="date" id="dateTournee"></label>
+    <span id="infoJour" class="info"></span>
+  </div>
+
+  <form id="formVisite" class="carte">
+    <h2>Ajouter un passage</h2>
+    <div class="grille">
+      <label>Patient <select id="vPatient" required></select></label>
+      <label>Heure du passage <input type="time" id="vHeure" required></label>
+      <label>Lieu
+        <select id="vLieu"><option value="DOMICILE">Domicile</option><option value="CABINET">Cabinet</option></select>
+      </label>
+    </div>
+    <fieldset>
+      <legend>Actes réalisés</legend>
+      <div class="ligne">
+        <select id="vActe"></select>
+        <button type="button" id="ajoutActe">+ Ajouter l'acte</button>
+      </div>
+      <details>
+        <summary>Acte libre (non présent dans le catalogue)</summary>
+        <div class="ligne">
+          <input id="libLettre" placeholder="Lettre (AMI…)" size="8">
+          <input id="libCoef" type="number" step="0.01" min="0" placeholder="Coef." style="width:6em">
+          <input id="libLibelle" placeholder="Libellé">
+          <label class="cb"><input type="checkbox" id="libTauxPlein"> Taux plein (dérogation 11B)</label>
+          <button type="button" id="ajoutLibre">+ Ajouter</button>
+        </div>
+      </details>
+      <ul id="listeActes" class="puces"></ul>
+    </fieldset>
+    <div class="ligne">
+      <label class="cb"><input type="checkbox" id="vMci"> MCI (soins palliatifs / pansement lourd et complexe)</label>
+      <label class="cb"><input type="checkbox" id="vNuit"> Prescription précisant le passage de nuit</label>
+      <label class="cb"><input type="checkbox" id="vMemeDep"> Autre patient du même domicile déjà facturé (pas d'IFD/IK)</label>
+    </div>
+    <div id="apercu"></div>
+    <button type="submit" class="principal">Enregistrer le passage</button>
+  </form>
+
+  <div class="carte">
+    <h2>Passages du jour</h2>
+    <div id="journee"></div>
+    <div class="ligne">
+      <button id="validerJournee" class="principal">Valider la journée → factures</button>
+      <button onclick="window.print()">Imprimer</button>
+    </div>
+  </div>
+</section>
+
+<!-- ================= PATIENTS ================= -->
+<section id="patients" class="onglet">
+  <form id="formPatient" class="carte">
+    <h2 id="titrePatient">Nouveau patient</h2>
+    <input type="hidden" id="pId">
+    <div class="grille">
+      <label>Nom <input id="pNom" required></label>
+      <label>Prénom <input id="pPrenom" required></label>
+      <label>Date de naissance <input type="date" id="pDdn"></label>
+      <label>N° de sécurité sociale (NIR) <input id="pNir" maxlength="21" placeholder="1 23 45 67 890 123 45"></label>
+      <label>Adresse <input id="pAdresse"></label>
+      <label>Prise en charge AMO
+        <select id="pPec"><option value="60">60 % (droit commun)</option><option value="100">100 % (ALD, maternité, AT…)</option></select>
+      </label>
+      <label>Forfait BSI
+        <select id="pBsi"><option value="">Aucun</option><option value="BSA">BSA – dépendance légère</option><option value="BSB">BSB – intermédiaire</option><option value="BSC">BSC – lourde</option></select>
+      </label>
+      <label class="cb"><input type="checkbox" id="pHorsAgglo"> Domicile hors agglomération du cabinet (IK)</label>
+      <label>Distance ALLER-RETOUR cabinet ↔ domicile (km) <input type="number" id="pDist" step="0.1" min="0"></label>
+      <label>Zone IK
+        <select id="pZone"><option value="PLAINE">Plaine</option><option value="MONTAGNE">Montagne</option><option value="PIED_SKI">À pied / à ski</option></select>
+      </label>
+    </div>
+    <p id="nirMsg" class="info"></p>
+    <button type="submit" class="principal">Enregistrer</button>
+    <button type="button" id="annulerPatient">Nouveau</button>
+  </form>
+  <div class="carte"><h2>Liste des patients</h2><div id="listePatients"></div></div>
+</section>
+
+<!-- ================= FACTURES ================= -->
+<section id="factures" class="onglet">
+  <div class="carte">
+    <h2>Factures validées</h2>
+    <div class="ligne">
+      <label>Du <input type="date" id="fDu"></label>
+      <label>Au <input type="date" id="fAu"></label>
+      <button id="exportCsv">Exporter CSV (Excel)</button>
+    </div>
+    <div id="listeFactures"></div>
+  </div>
+</section>
+
+<!-- ================= TARIFS ================= -->
+<section id="tarifs" class="onglet">
+  <div class="carte">
+    <h2>Tarifs appliqués à une date</h2>
+    <label>Date <input type="date" id="tDate"></label>
+    <div id="tableTarifs"></div>
+    <h2>Catalogue des actes</h2>
+    <div id="tableActes"></div>
+  </div>
+</section>
+
+<!-- ================= PARAMÈTRES ================= -->
+<section id="parametres" class="onglet">
+  <form id="formParam" class="carte">
+    <h2>Cabinet</h2>
+    <div class="grille">
+      <label>Nom de l'infirmier(e) <input id="sNom"></label>
+      <label>N° RPPS <input id="sRpps"></label>
+      <label>Zone tarifaire
+        <select id="sZone"><option value="METRO">Métropole</option><option value="DOM">DROM / Mayotte</option></select>
+      </label>
+      <label class="cb"><input type="checkbox" id="sAlsace"> Alsace-Moselle (Vendredi saint, 26 décembre fériés)</label>
+    </div>
+    <h2>Corriger / compléter un tarif</h2>
+    <p class="info">À n'utiliser qu'après vérification sur ameli.fr. Clé : CODE|ZONE|date de début de la période (voir onglet Tarifs).</p>
+    <div class="ligne">
+      <input id="sCle" placeholder="ex : AMI|DOM|2027-11-01" size="24">
+      <input id="sVal" type="number" step="0.01" placeholder="montant €" style="width:8em">
+      <button type="button" id="ajoutSurcharge">Enregistrer</button>
+    </div>
+    <ul id="listeSurcharges" class="puces"></ul>
+    <button type="submit" class="principal">Enregistrer les paramètres</button>
+  </form>
+  <div class="carte">
+    <h2>Sauvegarde</h2>
+    <p class="info">Les données restent sur cet ordinateur (navigateur). Faites une sauvegarde régulière.</p>
+    <button id="sauvegarder">Télécharger une sauvegarde</button>
+    <label class="bouton">Restaurer une sauvegarde <input type="file" id="restaurer" accept=".json" hidden></label>
+  </div>
+</section>
+</main>
+
+<script src="tarifs.js"></script>
+<script src="nomenclature.js"></script>
+<script src="moteur.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
